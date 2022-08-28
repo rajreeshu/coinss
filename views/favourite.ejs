@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favourite</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+
+        /* cards start */
+        .card .about-product img{
+            width:100%;
+        }
+        .form-group{
+            margin-bottom: 0px;
+            margin-top: 1rem;
+        }
+        a:hover{
+            text-decoration: none;
+        }
+        a{
+            color:black;
+        }
+        .card-description{
+            color:#5e5e5e;
+            text-align:left;
+        }
+        .card_title {
+            color:black !important;
+        }
+        .card_title::first-letter{
+            text-transform: capitalize;
+        }
+        .fa-star{
+            color:#f6d151;
+        }
+
+        /* cards ends */
+
+
+    </style>
+</head>
+<body>
+  <%- include('header') %>
+
+
+    <!-- cards start -->
+      <div class="d-flex justify-content container-fluid mt-5">
+        <div id="product_list" class="row d-flex justify-content-center mx-5"></div>
+    </div>
+    <!-- cards ends -->
+
+
+    <%- include('footer') %>
+
+    <!-- js starts -->
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script>
+    $(document).ready(function() {
+    
+        console.log(cookie_check);
+        if(cookie_check==""){
+            Location.href="<$=baseURL%>/login";
+        }
+        product_list="";
+        $.ajax({
+            url:"<%=baseURL%>/api/getFavourites/"+cookie_check,
+            type:"GET",
+            async:false,
+            dataType:"json",
+            success:(data)=>{
+                console.log(data);
+                $.each(data, function(key,value){
+                    product_list+='<div class="card p-3 bg-white col-md-2 col-12 m-3">';
+                    product_list+='<a href="<%=baseURL%>/product?productID='+value._id+'" style="text-decoration: none;">';
+                    product_list+='<div class="about-product text-center mt-2">';
+                    product_list+='<img src="https://picsum.photos/800" width="300">';
+                    product_list+='<div><h4 class="card_title mt-3">'+value.product_name+'</h4>';
+                    product_list+='</div></div></a>';
+                    product_list+='<div class="stats">';
+                    product_list+='<div class="d-flex justify-content p-price">';
+                    product_list+='<i class="fa fa-star mt-1"></i> &nbsp; <span class="">Star<br></span>';
+                    product_list+='</div>';
+                    product_list+='<div class="card-description">'+sliceString(value.description,75)+'</div>';
+                    product_list+='</div>';
+                    product_list+= '<div class="d-flex justify-content-between total font-weight-bold mt-4"><span>₹'+value.price+'</span><input type="submit" value="Buy Now" class="btn btn-danger float-right"></div>';
+                    product_list+='</div>';
+                });
+                $("#product_list").html(product_list);
+            },
+            error:(data)=>{
+                console.log(data);
+            }
+        });
+    });
+    </script>
+</body>
+</html>

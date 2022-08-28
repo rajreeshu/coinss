@@ -1,0 +1,94 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+<!-- header start -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href=" <%=baseURL%> "><img src="../assets/logo.png" style="height: 50px;"></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="<%=baseURL%>">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="<%=baseURL%>/admin">Admin</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Dropdown
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="<%=baseURL%>/favourites">Favourite</a>
+            <a class="dropdown-item" href="#">Another action</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Something else here</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="<%=baseURL%>/account">Account</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="<%=baseURL%>/chat">ChatMe</a>
+        </li>
+      </ul>
+      <form class="form-inline my-2 my-lg-0 d-none" id="searchForm">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="searchBox">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="searchBtn">Search</button>
+      </form> &nbsp;
+      <div class="btn btn-success" id="login_signup_btn">Login/SignUp</div>
+    </div>
+  </nav>
+<!-- header ends -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="<%=baseURL%>/assets/js/commonUse.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#login_signup_btn').on('click', function (e) {
+            location.href="<%=baseURL%>/login";
+        });
+    });
+</script>
+
+<script>
+  //get cookie function
+  function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+  // delete cookie fuction
+  function deleteCookie(cname){
+    document.cookie = cname+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    console.log("cookie deleted");
+  }
+
+  //check if cookie is present
+  cookie_check="";
+  $(document).ready(function() {
+  cookie_check=getCookie('coins-username');
+  if(cookie_check!=""){
+        $("#login_signup_btn").hide();
+        $("#logout_btn").show();
+      }
+  $("#logout_btn").click(function(){
+    deleteCookie("coins-username");
+    location.reload();
+  });
+  });
+  
+  
+</script>
+

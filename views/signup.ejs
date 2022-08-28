@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
+    <style>
+        .divider:after,
+.divider:before {
+content: "";
+flex: 1;
+height: 1px;
+background: #eee;
+}
+    </style>
+</head>
+<body>
+    <%- include('header') %>
+<!-- main page starts -->
+
+<!-- errot alert start -->
+<div class="alert alert-danger alert-dismissible fade show d-none" id="error-alert" role="alert" style="position:absolute; right:5px;">
+    <strong> </strong> <span class="text"></span>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+<!-- error alert ends -->
+<section class="vh-100">
+    <div class="container py-5 h-100">
+      <div class="row d-flex align-items-center justify-content-center h-100">
+        <div class="col-md-8 col-lg-7 col-xl-6 d-none d-md-block">
+          <img src="<%=baseURL%>/assets/signup.png"
+            class="img-fluid" alt="Phone image">
+        </div>
+        <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
+            
+          <form>
+            <!-- name input -->
+            <div class="form-outline mb-4">
+                <h1 class="d-flex justify-content-around align-items-center">Signup</h1>
+                <input type="text" placeholder="Full Name" id="signup_name" class="form-control form-control-lg" />
+              </div>
+            <!-- Email input -->
+            
+            <div class="form-outline mb-4">
+              <input type="email" placeholder="email" id="signup_email" class="form-control form-control-lg" />
+            </div>
+  
+            <!-- Password input -->
+            <div class="form-outline mb-4">
+              <input type="password" placeholder="password" id="signup_password" class="form-control form-control-lg" />
+            </div>
+
+            <!--confirm Password input -->
+            <div class="form-outline mb-4">
+                <input type="password" placeholder="Confirm Password" id="signup_confirm_password" class="form-control form-control-lg" />
+              </div>
+
+            <!-- gender -->
+            <div class="form-outline mb-4">
+                <select name="gender" id="signup_gender" class="form-control form-control-lg">
+                    <option value="">Gender</option>
+                    <option value="male">Male</option>
+                    <option value="saab">Female</option>
+                    <option value="mercedes">Others</option>
+                  </select>
+              </div>
+              
+              
+            
+  
+            <!-- Submit button -->
+            <button type="submit" id="signup_btn_submit" class="btn btn-primary btn-lg btn-block">Sign Up</button>
+  
+            <div class="divider d-flex align-items-center my-4">
+              <p class="text-center fw-bold mx-3 mb-0 text-muted">OR</p>
+            </div>
+  
+            <a href="<%=baseURL%>/login" class="btn btn-primary btn-lg btn-block" style="background-color: #3b5998" href="#!"
+              role="button">
+              <i class='fa fa-sign-in'></i> Login
+            </a>
+  
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- main page ends -->
+
+
+    <%- include('footer') %>
+</body>
+<script>
+    function validateEmail(email) {
+        var re = /\S+@\S+\.\S+/;
+        return re.test(email);
+    }
+
+    function signup_field_error(field,field_name){
+        if(field==""){
+            $("#error-alert strong").text("Enter "+field_name+" : ");
+            $("#error-alert .text").text(field_name+" can't be Empty");
+            $("#error-alert").removeClass("d-none");
+            return 1;
+        }
+        if(field_name=="Email"&&!validateEmail(field)){
+            $("#error-alert strong").text("Wrong "+field_name+" : ");
+            $("#error-alert .text").text("Enter a valid email address");
+            $("#error-alert").removeClass("d-none");
+            return 1;
+        }
+
+        if(field_name=="Password"&&field.length<6){
+            $("#error-alert strong").text("Small "+field_name+" : ");
+            $("#error-alert .text").text("Password must be at least 6 characters");
+            $("#error-alert").removeClass("d-none");
+            return 1;
+        }
+        return 0;
+    }
+
+    $("#signup_btn_submit").click(function(e){
+        e.preventDefault();
+        $("#error-alert").addClass("d-none");
+        let name=$("#signup_name").val();
+        let email=$("#signup_email").val();
+        let password=$("#signup_password").val();
+        let confirm_password=$("#signup_confirm_password").val();
+        let gender=$("#signup_gender").val();
+
+        if(signup_field_error(name,"Name")) return;
+        if(signup_field_error(email,"Email")) return;
+        if(signup_field_error(password,"Password")) return;
+        if(signup_field_error(confirm_password,"Confirm Password")) return;
+        if(password!=confirm_password){
+            $("#error-alert strong").text("Password Unmatched : ");
+            $("#error-alert .text").text("Confirm password and Password dosen't match");
+            $("#error-alert").removeClass("d-none");
+            return;
+        }
+        if(signup_field_error(gender,"Gender")) return;
+        
+        $.ajax({
+            url:"<%=baseURL%>/api/signup_form",
+            type:"POST",
+            async:false,
+            dataType:'json',
+            data:{
+                    "name": name,
+                    "email": email,
+                    "password": password,
+                    "confirm_password": confirm_password,
+                    "gender": gender
+            },
+            success:function(data) {
+                if(data.response=="success"){
+                  alert("access created successfully!");
+                  location.href="<%=baseURL%>/login";
+                }else{
+                  alert("something went wrong!");
+                }
+                console.log(data);
+            },
+            error:function(data){
+                console.log(data);
+            }
+        });
+
+    
+        
+
+
+        // console.log(name, email, password, confirm_password, gender);
+    });
+</script>
+</html>

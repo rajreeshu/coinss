@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatMe - Home</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+
+
+    </style>
+</head>
+
+<body>
+    <%- include('../header') %>
+        <!-- main page starts -->
+
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <section class="m-3 p-3" style="border:1px solid black; background-color: bisque;">
+                    <h3>Users</h3>
+                    <div id="userList">
+
+                    </div>
+
+                </section>
+            </div>
+            <div class="col-md-6 col-12">
+                <section class="m-3 p-3" style="border:1px solid black; background-color: blanchedalmond;">
+                    <h3 id="receiverHead">UserName</h3>
+                    <div id="chatMessage" class="" style="max-height:65vh; overflow-y: scroll;">
+                        <div class="alert alert-info w-50 float-right" role="alert">
+                            CLICK ON ANY USER
+                        </div>
+                    </div>
+                    <textarea id="chatText" style="width:80%; border-radius: 5px;"></textarea>
+                    <button id="chatSend" class="btn btn-primary float-right">Send</button>
+                </section>
+            </div>
+        </div>
+
+        <!-- main page ends -->
+
+        <%- include('../footer') %>
+
+            <!-- js starts -->
+
+            <script src="/socket.io/socket.io.js"></script>
+            <script>
+                $(document).ready(function () {
+                    if (!cookie_check) {
+                        alert("Please Login First!");
+                        location.href = "<%=baseURL%>";
+                    }
+                });
+                var socket = io();
+                let receiverId = "";
+                let receiverEmail = "";
+
+                function getUsers() {
+                    $.ajax({
+                        url: '<%=baseURL%>/chat/users',
+                        type: 'GET',
+                        dataType: 'json',
+                        async: false,
+                        success: function (data) {
+                            // console.log(data);
+                            let userList = "";
+                            data.forEach(element => {
+                                userList += `<div class="alert alert-light userList" role="alert" data-email="${element.email}" data-id="${element._id}">
+                                                ${element.name}
+                                            </div>`;
+                            });
+                            $("#userList").html(userList);
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                }
+                getUsers();
+                $(".userList").click(function () {
+                    receiverId = $(this).data("id");
+                    receiverEmail = $(this).data("email");
+                    console.log(receiverEmail);
+                    let receiverName = $(this).text().trim();
+                    $("#receiverHead").text(receiverName);
+                    getChat(receiverId)
+                });
+
+                function getChat(receiverId) {
+                    $.ajax({
+                        url: '<%=baseURL%>/chat/chat/' + cookie_check + '/' + receiverId,
+                        type: 'GET',
+                        dataType: 'json',
+                        async: false,
+                        success: function (data) {
+                            // console.log(data);
+                            let chatMessage = "";
+                            data.forEach(element => {
+                                chatMessage += `<div class="alert alert-info" role="alert">
+                                                ${element.senderId.name}:${element.message}
+                                            </div>`;
+                            });
+                            $("#chatMessage").html(chatMessage);
+                            
+
+
+                            var objDiv = document.getElementById("chatMessage");
+                            objDiv.scrollTop = objDiv.scrollHeight;
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                }
+
+                function sendMessage() {
+                    $.ajax({
+                        url: '<%=baseURL%>/chat/chat',
+                        type: 'POST',
+                        dataType: 'json',
+                        async: false,
+                        data: {
+                            senderMail: cookie_check,
+                            receiverId: receiverId,
+                            message: $("#chatText").val()
+                        },
+                        success: function (data) {
+                            // console.log(data);
+                            getChat(receiverId);
+                            $("#chatText").val('');
+                            // console.log(data.receiverId.email);
+                            socket.emit('msgSent', { receiverEmail: receiverEmail });                            
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                }
+                $("#chatSend").click((e) => {
+                    sendMessage();
+                });
+                
+                //  socket.on('message', getUsers);
+                $(document).ready(function () {
+                    socket.emit('join', { email: cookie_check });
+                })
+                socket.on('msgReceived', (receivedData)=>{
+                    console.log(receivedData)
+                    if(receivedData.senderEmail){
+                        getChat(receiverId);
+                    }
+                });
+
+            </script>
+</body>
+
+</html>

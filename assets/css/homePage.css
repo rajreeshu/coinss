@@ -1,0 +1,53 @@
+ /* slider start */
+ .carousel .carousel-item {
+    height: 400px;
+}
+
+.carousel-item img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-height: 400px;
+}
+@media only screen and (max-width: 768px) {
+    .carousel .carousel-item {
+        height: 200px;
+    }
+
+    .carousel-item img {
+        min-height: 200px;
+    }
+}
+/* slider ends */
+
+
+/* cards start */
+.card .about-product img{
+    width:100%;
+}
+.form-group{
+    margin-bottom: 0px;
+    margin-top: 1rem;
+}
+a:hover{
+    text-decoration: none;
+}
+a{
+    color:black;
+}
+.card-description{
+    color:#5e5e5e;
+    text-align:left;
+}
+.card_title {
+    color:black !important;
+}
+.card_title::first-letter{
+    text-transform: capitalize;
+}
+.fa-star{
+    color:#f6d151;
+}
+
+/* cards ends */
+

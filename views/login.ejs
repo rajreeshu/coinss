@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
+  <style>
+    .divider:after,
+    .divider:before {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #eee;
+    }
+  </style>
+</head>
+
+<body>
+  <%- include('header') %>
+    <!-- main page starts -->
+
+    <!-- errot alert start -->
+    <div class="alert alert-danger alert-dismissible fade show d-none" id="error-alert" role="alert"
+      style="position:absolute; right:5px;">
+      <strong> </strong> <span class="text"></span>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <!-- error alert ends -->
+
+    <section class="vh-100">
+      <div class="container py-5 h-100">
+        <div class="row d-flex align-items-center justify-content-center h-100">
+          <div class="col-md-8 col-lg-7 col-xl-6 d-none d-md-block">
+            <img src="<%=baseURL%>/assets/login.png" class="img-fluid" alt="Phone image">
+          </div>
+          <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
+
+            <form>
+              <!-- Email input -->
+
+              <div class="form-outline mb-4">
+                <h1 class="d-flex justify-content-around align-items-center">Login</h1>
+                <input type="email" id="login_email" class="form-control form-control-lg" />
+                <label class="form-label" for="form1Example13">Email address</label>
+              </div>
+
+              <!-- Password input -->
+              <div class="form-outline mb-4">
+                <input type="password" id="login_password" class="form-control form-control-lg" />
+                <label class="form-label" for="form1Example23">Password</label>
+              </div>
+
+              <div class="d-flex justify-content-around align-items-center mb-4">
+                <!-- Checkbox -->
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="1" id="remember_me_check" />
+                  <label class="form-check-label" for="form1Example3"> Remember me </label>
+                </div>
+                <a href="#!">Forgot password?</a>
+              </div>
+
+              <!-- Submit button -->
+              <button type="submit" id="login_submit" class="btn btn-primary btn-lg btn-block">Sign in</button>
+
+              <div class="divider d-flex align-items-center my-4">
+                <p class="text-center fw-bold mx-3 mb-0 text-muted">OR</p>
+              </div>
+
+              <a href="<%=baseURL%>/signup" class="btn btn-primary btn-lg btn-block" id="signup_btn"
+                style="background-color: #3b5998" href="#!" role="button">
+                <i class="fa-solid fa-user-plus"></i> Signup
+              </a>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- main page ends -->
+    <%- include('footer') %>
+      <script>
+        //cookie setup
+        function setCookie(cname, cvalue, exdays) {
+          const d = new Date();
+          d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+          let expires = "expires=" + d.toUTCString();
+          document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
+
+        //get cookie
+        function getCookie(cname) {
+          let name = cname + "=";
+          let decodedCookie = decodeURIComponent(document.cookie);
+          let ca = decodedCookie.split(';');
+          for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+              c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length);
+            }
+          }
+          return "";
+        }
+      </script>
+
+      <script>
+
+        cookie_check = getCookie('coins-username');
+        if (cookie_check != "") {
+          location.href = "<%=baseURL%>";
+        }
+        $("#login_submit").click(function (e) {
+          e.preventDefault();
+          $("#error-alert").addClass("d-none");
+          let email = $("#login_email").val();
+          let password = $("#login_password").val();
+
+          if (email == "") {
+            $("#error-alert strong").text("Enter Email : ");
+            $("#error-alert .text").text("Email can't be Empty");
+            $("#error-alert").removeClass("d-none");
+            return;
+          }
+          if (password == "") {
+            $("#error-alert strong").text("Enter Password : ");
+            $("#error-alert .text").text("Password can't be Empty");
+            $("#error-alert").removeClass("d-none");
+            return;
+          }
+          $.ajax({
+            url: "<%=baseURL%>/api/login_form",
+            type: "POST",
+            dataType: "JSON",
+            async: false,
+            data: {
+              "email": email,
+              "password": password
+            },
+            success: function (data) {
+              if (data.response == "verified") {
+                cookie_day = 1;
+                if ($("#remember_me_check:checked").val() == 1) {
+                  cookie_day = 365;
+                }
+
+                setCookie("coins-username", email, cookie_day);
+                location.href = "<%=baseURL%>";
+              } else {
+                $("#error-alert strong").text("Incorrect details : ");
+                $("#error-alert .text").text("No account is accociated with this email and password");
+                $("#error-alert").removeClass("d-none");
+              }
+            },
+            error: function (data) {
+              console.log(data);
+            }
+          });
+
+        });
+      </script>
+</body>
+
+</html>

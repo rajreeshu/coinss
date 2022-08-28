@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coinss - Home</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <style>
+
+
+  </style>
+</head>
+
+<body>
+  <%- include('header') %>
+    <!-- main page starts -->
+
+    <!-- errot alert start -->
+    <div class="alert alert-danger alert-dismissible fade show d-none" id="error-alert" role="alert"
+      style="position:absolute; right:5px;">
+      <strong> </strong> <span class="text"></span>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <!-- error alert ends -->
+    <section class="vh-100">
+      <div class="container py-5 h-100">
+        <div class="row d-flex align-items-center justify-content-center h-100">
+          <div class="col-md-8 col-lg-7 col-xl-6 d-none d-md-block">
+            <img src="<%=baseURL%>/assets/admin.png" class="img-fluid" alt="Phone image">
+          </div>
+          <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
+
+            <form>
+              <!-- name input -->
+              <div class="form-outline mb-4">
+                <h1 class="d-flex justify-content-around align-items-center">Admin</h1>
+                <input type="text" placeholder="Product Name" id="product_name" class="form-control form-control-lg" />
+              </div>
+              <!-- Email input -->
+
+              <div class="form-outline mb-4">
+                <!-- <input type="number" placeholder="Price" id="product_price" class="form-control form-control-lg" /> -->
+                <select id="product_price" class="form-control">
+                  <option value="1">₹1</option>
+                  <option value="2">₹2</option>
+                  <option value="5">₹5</option>
+                  <option value="10">₹10</option>
+                </select>
+
+              </div>
+
+              <!-- gender -->
+              <div class="form-outline mb-4">
+                <!-- <label style="color:#878282;">Description</label> -->
+                <textarea rows="10" placeholder="Description" id="product_description" class="form-control"></textarea>
+              </div>
+
+              <!-- profile picture -->
+              <div class="form-outline mb-4">
+                <input type="file" id="profileImg" class="form-control">
+              </div>
+
+              <!-- Submit button -->
+              <button type="submit" id="product_btn_submit" class="btn btn-primary btn-lg btn-block">Submit</button>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- main page ends -->
+
+
+
+    <%- include('footer') %>
+
+      <!-- js starts -->
+      <script>
+        document.getElementById('product_btn_submit').addEventListener('click', function (e) {
+          e.preventDefault();
+          var product_name = document.getElementById('product_name').value;
+          var product_price = document.getElementById('product_price').value;
+          var product_description = document.getElementById('product_description').value;
+          var product_owner = "";
+          $.ajax({
+            url: "<%=baseURL%>/api/get_userID/" + cookie_check,
+            type: "GET",
+            dataType: "JSON",
+            async: false,
+            success: (data) => {
+              console.log(data);
+              product_owner = data;
+            },
+            error: (error) => {
+              console.log(error);
+            }
+          });
+          let formDataInsert=new FormData();
+          let img=$("#profileImg")[0].files;
+          if(img.length>0){
+            formDataInsert.append('profileImg',img[0]);
+          }
+          formDataInsert.append('product_name',product_name);
+          formDataInsert.append('price',product_price);
+          formDataInsert.append('description',product_description);
+          formDataInsert.append('owner',product_owner);
+          $.ajax({
+            url: "<%=baseURL%>/admin/product",
+            type: "POST",
+            dataType: "JSON",
+            async: false,
+            data:formDataInsert,
+             contentType: false,
+            processData: false,
+            success: (data) => {
+              console.log(data);
+              // location.href = "<%=baseURL%>/product?productID=" + data._id;
+              location.href = "<%=baseURL%>";
+            },
+            error: (error) => {
+              console.log(error);
+            }
+          });
+
+
+
+
+          // console.log(cookie_check);
+        });
+      </script>
+</body>
+
+</html>
